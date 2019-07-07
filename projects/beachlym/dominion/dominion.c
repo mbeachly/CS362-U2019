@@ -580,12 +580,12 @@ int drawCard(int player, struct gameState *state)
   return 0;
 }
 
-int discardHand(int handPos, int currentPlayer, struct gameState *state)
+int discardHand(int currentPlayer, struct gameState *state)
 {
 	//discard hand
 	while(numHandCards(state) > 0)
 	{
-	  discardCard(handPos, currentPlayer, state, 0);
+	  discardCard(0, currentPlayer, state, 0); // BUG! Intentionally added
 	}
   return 0;
 }
@@ -660,20 +660,23 @@ int baronAct(int choice1, struct gameState *state)
 	int currentPlayer = whoseTurn(state);// Get current player
 	state->numBuys++;//Increase buys by 1!
      if (choice1 > 0){//Boolean true for going to discard an estate
-	int p = 0;//Iterator for hand!
+	//int p = 0;//Iterator for hand!
+	int p = 1; // BUG! Intentionally added, correct code above
 	int card_not_discarded = 1;//Flag for discard set!
 	while(card_not_discarded){
 	  if (state->hand[currentPlayer][p] == estate){//Found an estate card!
 	    state->coins += 4;//Add 4 coins to the amount of coins
 	    state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
 	    state->discardCount[currentPlayer]++;
-	    for (;p < state->handCount[currentPlayer]; p++){ // BUG???
+	    //for (;p < state->handCount[currentPlayer]; p++){ 
+	    for (p = 0; p < state->handCount[currentPlayer]; p++){ //BUG! Intentionally added
 	      state->hand[currentPlayer][p] = state->hand[currentPlayer][p+1];
 	    }
 	    state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
 	    state->handCount[currentPlayer]--;
 	    card_not_discarded = 0;//Exit the loop
 	  }
+	  // BUG?? p index starts at 0 so maybe p >= ...
 	  else if (p > state->handCount[currentPlayer]){
 	    if(DEBUG) {
 	      printf("No estate cards in your hand, invalid choice\n");
@@ -728,7 +731,8 @@ int minionAct(int choice1, int choice2, struct gameState *state, int handPos)
      else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
 	{
 	  //discard hand
-	  discardHand(handPos, currentPlayer, state);
+	  // Added a bug in this function
+	  discardHand(currentPlayer, state);
 				
 	  //draw 4
 	  for (i = 0; i < 4; i++)
@@ -744,10 +748,12 @@ int minionAct(int choice1, int choice2, struct gameState *state, int handPos)
 		  if ( state->handCount[i] > 4 )
 		    {
 		      //discard hand
-		      discardHand(handPos, currentPlayer, state);
+		      // discardHand(i, state);
+		      discardHand(currentPlayer, state); // BUG! Intentionally added
 							
 		      //draw 4
-		      for (j = 0; j < 4; j++)
+		      //for (j = 0; j < 4; j++)
+		      for (i = 0; i < 4; i++) //BUG! Intentionally added
 			 {
 			  drawCard(i, state);
 			 }
@@ -765,7 +771,8 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
       int j = 0;		//used to check if player has enough cards to discard
       int currentPlayer = whoseTurn(state);// Get current player
 
-      if (choice2 > 2 || choice2 < 0)
+      //if (choice2 > 2 || choice2 < 0)
+      if (choice2 > 2) // BUG! Intentionally added
 	{
 	  return -1;				
 	}
@@ -776,7 +783,7 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 	}
       // Count how many of the revealed card are available in the hand
       for (i = 0; i < state->handCount[currentPlayer]; i++)
-	{ // Last condition looks like a BUG!
+	{ // Third condition looks like a BUG!
 	  if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
 	    {
 	      j++;
@@ -798,7 +805,8 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 	{
 	  if (i != currentPlayer)
 	    {
-	      gainCard(state->hand[currentPlayer][choice1], state, 0, i);
+	      //gainCard(state->hand[currentPlayer][choice1], state, 0, i);
+	      gainCard(choice1, state, 0 , i); // BUG! Intentionally added
 	    }
 	}
 
@@ -824,7 +832,8 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 int tributeAct(struct gameState* state)
 {
      int currentPlayer = whoseTurn(state);
-     int nextPlayer = currentPlayer + 1;
+     //int nextPlayer = currentPlayer + 1;
+     int nextPlayer = currentPlayer++; // BUG! Intentionally added
      int i;
      int tributeRevealedCards[2] = {-1, -1};
 
@@ -851,6 +860,7 @@ int tributeAct(struct gameState* state)
 	// Check if deck is empty
 	if (state->deckCount[nextPlayer] == 0){
 	  // Move discard pile to deck
+	  // BUG?? discardCount[nextPlayer] is changing
 	  for (i = 0; i < state->discardCount[nextPlayer]; i++){
 	    state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
 	    state->deckCount[nextPlayer]++;
@@ -862,11 +872,13 @@ int tributeAct(struct gameState* state)
 	} 
 	tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 	state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
-	state->deckCount[nextPlayer]--;
-	// BUG? What if deck only had one card?
+	state->deckCount[nextPlayer]--; // BUG? Would this double decrement?
+        state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[0];// BUG! Intentional
+	// BUG? What if deck only had one card? Also how do revealed cards go to discard?
 	tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
 	state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
 	state->deckCount[nextPlayer]--;
+	state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[1];// BUG! Intentional
       }    
 		       
       if (tributeRevealedCards[0] == tributeRevealedCards[1]){//If we have a duplicate card, just drop one 
@@ -875,7 +887,7 @@ int tributeAct(struct gameState* state)
 	tributeRevealedCards[1] = -1;
       }
 
-      for (i = 0; i <= 2; i ++){
+      for (i = 0; i <= 2; i++){
 	if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold){//Treasure cards
 	  state->coins += 2;
 	}
@@ -895,36 +907,40 @@ int tributeAct(struct gameState* state)
 int mineAct(int choice1, int choice2, struct gameState* state, int handPos)
 {
       int currentPlayer = whoseTurn(state);
-      int j = state->hand[currentPlayer][choice1];  //store card we will trash
       int i;
+      int j = state->hand[currentPlayer][choice1];  //store card we will trash
 
-      if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
+      // Make sure first choice is treasure
+      //if (j < copper || j > gold)
+      if (j > treasure_map || j < curse) // BUG! Intentionally added
 	{
 	  return -1;
 	}
-      // BUG?? Would not ensure that they choose copper, silver or gold
+      // BUG?? Would allow player to choose non-treasure cards
       if (choice2 > treasure_map || choice2 < curse)
 	{
 	  return -1;
 	}
 
-      if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
+      if ( (getCost(j) + 3) > getCost(choice2) )
 	{
 	  return -1;
 	}
 
       gainCard(choice2, state, 2, currentPlayer);
 
-      //discard card from hand
+      //discard played card from hand
       discardCard(handPos, currentPlayer, state, 0);
 
-      //discard trashed card
+      //discard trashed treasure card
       for (i = 0; i < state->handCount[currentPlayer]; i++)
 	{
 	  if (state->hand[currentPlayer][i] == j)
 	    { // BUG?? How does this trash the card instead of discarding it?
+	      // What if the card wasn't even in the hand?
 	      discardCard(i, currentPlayer, state, 0);			
-	      break;
+	      // break; 
+	      // BUG! Intentionally added, uncomment break to fix
 	    }
 	}
 			
