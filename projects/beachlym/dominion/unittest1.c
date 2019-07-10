@@ -47,19 +47,78 @@ int main () {
 	       remodel, smithy, village, baron, great_hall};
   int handCount = 5;
   int hand[5];
-  int handTest = -1;
+  int baronPos = 4;
+  int estatePos = 0;
+  int handTest, discardTest;
   struct gameState G, preG;
  
   PutSeed(seed);
-  // Fill hand with non-estate cards (0 = curse card)
-  memset(hand, 0, handCount * sizeof(int));
 
-  // Test one estate card at each hand position
+  // Fill hand with non-estate cards (barons)
+  memset(hand, 15, handCount * sizeof(int));
+   
+//--------------------------------------------
+// Test hand with no estate cards
+//--------------------------------------------
+  printf ("\nTesting baronAct() with no Estate card in hand\n");
+
+  memset(&G, 0, sizeof(struct gameState)); // Clear game state
+  r = initializeGame(numPlayer, k, seed, &G); // Initialize new game
+  G.handCount[player1] = handCount; // Set number of cards in hand
+  // Copy hand with 1 Estate card
+  memcpy(G.hand[player1], hand, sizeof(int) * handCount);
+  // Save the previous game state before testing function
+  memcpy(&preG, &G, sizeof(struct gameState));
+
+  // Call the function being tested
+  //baronAct(0, &G); 
+  playCard(baronPos, estatePos, 0, 0, &G);
+
+  printf("Testing that player has 2 buys:\n");
+  asserttrue(G.numBuys == 2);
+
+  printf("Testing that player hand size is 4:\n");
+  if(!asserttrue(G.handCount[player1]==4)) {
+    printf("(player hand size is %d)\n", G.handCount[player1]);
+  }
+
+  printf("Testing that no Estate is in hand:\n");
+  handTest = -1;
+  for (j = 0; j < G.handCount[player1]; j++) {
+    // Is there still an estate card in hand?
+    if (G.hand[player1][j] == 1) {handTest = j;}
+  }
+  if (!asserttrue(handTest == -1)){
+    printf("(Estate is in hand at position %d)\n", handTest);
+  }
+
+  printf("Testing that Estate was gained to player's discard pile:\n");
+  discardTest = -1;
+  for (j = 0; j < G.discardCount[player1]; j++) {
+    // Is there an estate in the discard?
+    if (G.discard[player1][j] == 1) {discardTest = j;}
+  }
+  asserttrue(discardTest != -1);
+
+  printf("Testing that discard count is 2:\n");
+  if(!asserttrue(G.discardCount[player1] == 2)) {
+    printf("(discard count is %d)\n", G.discardCount[player1]);
+  }
+
+  printf("Testing that player received 0 coins:\n");
+  if (!asserttrue(G.coins == 0)) {
+    printf("(player received %d coins)\n", G.coins);
+  }
+
+ 
+//--------------------------------------------
+// Test one estate card at each hand position
+//--------------------------------------------
   for (i = 0; i < handCount; i++) {
    printf ("\nTesting baronAct() with one Estate card at hand position %d\n", i);
    hand[i] = 1; // 1 = estate card
     if (i > 0) { // Remove previous estate card
-      hand[i-1] = 0; // curse card
+      hand[i-1] = 15; // 15 = baron
     }
 
     memset(&G, 0, sizeof(struct gameState)); // Clear game state
@@ -70,11 +129,22 @@ int main () {
     // Save the previous game state before testing function
     memcpy(&preG, &G, sizeof(struct gameState));
 
+    estatePos = i;
+    if (estatePos == baronPos) {baronPos = 0;}
     // Call the function being tested
-    baronAct(i, &G); // Try to discard estate card 
+    playCard(baronPos, estatePos, 0, 0, &G);
+
+    printf("Testing that player has 2 buys:\n");
+    asserttrue(G.numBuys == 2);
+
+    printf("Testing that player hand size is 3:\n");
+    if(!asserttrue(G.handCount[player1]==3)) {
+      printf("(player hand size is %d)\n", G.handCount[player1]);
+    }
 
     printf("Testing that Estate is no longer in hand:\n");
-    for (j = 0; j < handCount; j++) {
+    handTest = -1;
+    for (j = 0; j < G.handCount[player1]; j++) {
       // Is there still an estate card in hand?
       if (G.hand[player1][j] == 1) {handTest = j;}
     }
@@ -82,17 +152,82 @@ int main () {
       printf("(Estate is still in hand at position %d)\n", handTest);
     }
 
-    printf("Testing that Estate is on player's discard pile:\n");
-    asserttrue(G.discard[player1][0] == 1);
+    printf("Testing that Estate is in player's discard pile:\n");
+    discardTest = -1;
+    for (j = 0; j < G.discardCount[player1]; j++) {
+      // Is there an estate in the discard?
+      if (G.discard[player1][j] == 1) {discardTest = j;}
+    }
+    asserttrue(discardTest != -1);
+
+    printf("Testing that discard count is 2:\n");
+    if(!asserttrue(G.discardCount[player1] == 2)) {
+      printf("(discard count is %d)\n", G.discardCount[player1]);
+    }
 
     printf("Testing that player received 4 coins:\n");
     if (!asserttrue(G.coins == 4)) {
       printf("(player received %d coins)\n", G.coins);
     }
   }
+   
+//--------------------------------------------
+// Test hand with two estate cards
+//--------------------------------------------
+  printf ("\nTesting baronAct() with two Estate cards in hand\n");
 
-  if (testsFailed) {printf("\nbaronAct() failed %d tests\n", testsFailed);}
-  else {printf("\nbaronAct() passed all %d tests!\n", testsPassed);}
+  memset(&G, 0, sizeof(struct gameState)); // Clear game state
+  r = initializeGame(numPlayer, k, seed, &G); // Initialize new game
+  G.handCount[player1] = handCount; // Set number of cards in hand
+  hand[3] = 1;
+  // Copy hand with 1 Estate card
+  memcpy(G.hand[player1], hand, sizeof(int) * handCount);
+  // Save the previous game state before testing function
+  memcpy(&preG, &G, sizeof(struct gameState));
+
+  // Call the function being tested
+  //baronAct(0, &G); 
+  playCard(baronPos, estatePos, 0, 0, &G);
+
+  printf("Testing that player has 2 buys:\n");
+  asserttrue(G.numBuys == 2);
+
+  printf("Testing that player hand size is 3:\n");
+  if(!asserttrue(G.handCount[player1]==3)) {
+    printf("(player hand size is %d)\n", G.handCount[player1]);
+  }
+
+  printf("Testing that 1 Estate is in hand:\n");
+  handTest = 0;
+  for (j = 0; j < G.handCount[player1]; j++) {
+    // Is there still an estate card in hand?
+    if (G.hand[player1][j] == 1) {handTest++;}
+  }
+  if (!asserttrue(handTest == 1)){
+    printf("(%d Estate card(s) in hand)\n", handTest);
+  }
+
+  printf("Testing that Estate was discarded to player's discard pile:\n");
+  discardTest = 0;
+  for (j = 0; j < G.discardCount[player1]; j++) {
+    // Is there an estate in the discard?
+    if (G.discard[player1][j] == 1) {discardTest++;}
+  }
+  asserttrue(discardTest);
+
+  printf("Testing that discard count is 2:\n");
+  if(!asserttrue(G.discardCount[player1] == 2)) {
+    printf("(discard count is %d)\n", G.discardCount[player1]);
+  }
+
+  printf("Testing that player received 4 coins:\n");
+  if (!asserttrue(G.coins == 4)) {
+    printf("(player received %d coins)\n", G.coins);
+  }
+
+
+  if (testsFailed) {printf("\nFAILED %d tests\n", testsFailed);}
+  else {printf("\nPASSED all %d tests\n", testsPassed);}
 
   return 0;
 }
