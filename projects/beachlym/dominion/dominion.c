@@ -716,8 +716,9 @@ int baronAct(int choice1, struct gameState *state)
 
 int minionAct(int choice1, int choice2, struct gameState *state, int handPos)
 {
+     printf("In minionAct(), choice1=%d, choice2=%d\n", choice1, choice2);
      int i, j;
-	//+1 action
+     //+1 action
      state->numActions++;
 			
      int currentPlayer = whoseTurn(state);// Get current player
