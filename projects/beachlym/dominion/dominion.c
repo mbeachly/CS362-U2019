@@ -657,6 +657,7 @@ int getCost(int cardNumber)
 // Called by cardEffect function
 int baronAct(int choice1, struct gameState *state)
 {
+	//printf("In baronAct(), choice1=%d\n", choice1);
 	int currentPlayer = whoseTurn(state);// Get current player
 	state->numBuys++;//Increase buys by 1!
      if (choice1 > 0){//Boolean true for going to discard an estate
