@@ -716,7 +716,7 @@ int baronAct(int choice1, struct gameState *state)
 
 int minionAct(int choice1, int choice2, struct gameState *state, int handPos)
 {
-     printf("In minionAct(), choice1=%d, choice2=%d\n", choice1, choice2);
+     //printf("In minionAct(), choice1=%d, choice2=%d\n", choice1, choice2);
      int i, j;
      //+1 action
      state->numActions++;
@@ -772,7 +772,8 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
       int i;
       int j = 0;		//used to check if player has enough cards to discard
       int currentPlayer = whoseTurn(state);// Get current player
-
+      //printf("In ambassadorAct, choice1 = %d, choice2 = %d, currentPlayer = %d\n", choice1, choice2, currentPlayer);
+ 
       //if (choice2 > 2 || choice2 < 0)
       if (choice2 > 2) // BUG! Intentionally added
 	{

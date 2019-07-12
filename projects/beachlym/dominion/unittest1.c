@@ -36,6 +36,7 @@ int asserttrue(int testResult) {
 	}
 }
 
+
 int main () {
 
   int i, j;
@@ -65,8 +66,8 @@ int main () {
 //--------------------------------------------
   for (choice1 = 0; choice1 < 2; choice1++) 
   {
-    if (choice1 == 0) {printf("\nTesting Baron with no Estate card in hand - choose gain\n");}
-    else {printf("\nTesting Baron with no Estate card in hand - choose discard\n");}
+    if (choice1 == 0) {printf("\nTesting Baron with no Estate card in hand: choosing gain\n");}
+    else {printf("\nTesting Baron with no Estate card in hand: choosing discard\n");}
 
     memset(&G, 0, sizeof(struct gameState)); // Clear game state
     initializeGame(numPlayer, k, seed, &G); // Initialize new game

@@ -40,10 +40,11 @@ int main () {
 
   int i;
   int seed = 1000;
-  int numPlayer = 3;
+  int numPlayer = 4;
   int player1 = 0;
   int player2 = 1;
   int player3 = 2;
+  int player4 = 3;
   int k[10] = {minion, council_room, feast, gardens, mine,
 	       remodel, smithy, village, baron, great_hall};
   int handCount = 5;
@@ -110,7 +111,8 @@ int main () {
   initializeGame(numPlayer, k, seed, &G); // Initialize new game
   G.handCount[player1] = handCount; // Set number of cards in hand
   G.handCount[player2] = 5;
-  G.handCount[player3] = 4;
+  G.handCount[player3] = 5;
+  G.handCount[player4] = 4;
  // Copy hand with minion card
   memcpy(G.hand[player1], hand, sizeof(int) * handCount);
   memcpy(G.hand[player2], hand, sizeof(int) * handCount);
@@ -149,8 +151,8 @@ int main () {
   }
 
   printf("Testing that player2 discard count is 5:\n");
-  if(!asserttrue(G.discardCount[player3] == 5)) {
-    printf("(discard count is %d)\n", G.discardCount[player3]);
+  if(!asserttrue(G.discardCount[player2] == 5)) {
+    printf("(discard count is %d)\n", G.discardCount[player2]);
   }
 
   printf("Testing that player3 hand size is 4:\n");
@@ -158,11 +160,20 @@ int main () {
     printf("(hand size is %d)\n", G.handCount[player3]);
   }
 
-  printf("Testing that player3 discard count is 0:\n");
-  if(!asserttrue(G.discardCount[player1] == 0)) {
-    printf("(discard count is %d)\n", G.discardCount[player1]);
+  printf("Testing that player3 discard count is 5:\n");
+  if(!asserttrue(G.discardCount[player3] == 5)) {
+    printf("(discard count is %d)\n", G.discardCount[player3]);
   }
 
+  printf("Testing that player4 hand size is 4:\n");
+  if(!asserttrue(G.handCount[player4]==4)) {
+    printf("(hand size is %d)\n", G.handCount[player4]);
+  }
+
+  printf("Testing that player4 discard count is 0:\n");
+  if(!asserttrue(G.discardCount[player4] == 0)) {
+    printf("(discard count is %d)\n", G.discardCount[player4]);
+  }
 
 
 //----------------------------------------------
