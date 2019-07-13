@@ -786,7 +786,7 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 	}
       // Count how many of the revealed card are available in the hand
       for (i = 0; i < state->handCount[currentPlayer]; i++)
-	{ // Third condition looks like a BUG!
+	{ // Second & Third condition looks like BUG!
 	  if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
 	    {
 	      j++;
@@ -796,13 +796,11 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 	{
 	  return -1;				
 	}
-
       if (DEBUG) 
 	printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
 
       //increase supply count for choosen card by amount being discarded
-      state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
-			
+      state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;	
       //each other player gains a copy of revealed card
       for (i = 0; i < state->numPlayers; i++)
 	{
@@ -815,7 +813,6 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 
       //discard played card from hand
       discardCard(handPos, currentPlayer, state, 0);			
-
       //trash copies of cards returned to supply
       for (j = 0; j < choice2; j++)
 	{
@@ -834,6 +831,7 @@ int ambassadorAct(int choice1, int choice2, struct gameState * state, int handPo
 
 int tributeAct(struct gameState* state)
 {
+     //printf("Inside tributeAct()");
      int currentPlayer = whoseTurn(state);
      //int nextPlayer = currentPlayer + 1;
      int nextPlayer = currentPlayer++; // BUG! Intentionally added
