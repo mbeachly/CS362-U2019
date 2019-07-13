@@ -907,6 +907,7 @@ int tributeAct(struct gameState* state)
 
 int mineAct(int choice1, int choice2, struct gameState* state, int handPos)
 {
+      //printf("In mineAct(), choice1 = %d, choice2 = %d\n", choice1, choice2);
       int currentPlayer = whoseTurn(state);
       int i;
       int j = state->hand[currentPlayer][choice1];  //store card we will trash
@@ -915,16 +916,19 @@ int mineAct(int choice1, int choice2, struct gameState* state, int handPos)
       //if (j < copper || j > gold)
       if (j > treasure_map || j < curse) // BUG! Intentionally added
 	{
+          //printf("choice1 (%d) card index (%d) invalid\n", choice1, j);
 	  return -1;
 	}
       // BUG?? Would allow player to choose non-treasure cards
       if (choice2 > treasure_map || choice2 < curse)
 	{
+	  //printf("choice2 (%d) invalid\n", choice2);
 	  return -1;
 	}
-
+      // BUG!! Should be <=
       if ( (getCost(j) + 3) > getCost(choice2) )
 	{
+          printf("cost difference invalid: %d + 3 > %d\n", getCost(j), getCost(choice2));
 	  return -1;
 	}
 
