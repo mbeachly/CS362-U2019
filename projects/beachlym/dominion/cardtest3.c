@@ -1,7 +1,7 @@
 /*************************************************************
  * Author:	Matt Beachly
  * Date:	7/13/19
- * Description:	Unit tests for shuffle() function
+ * Description:	Unit tests for endTurn() function
  *************************************************************/
 
 #include "dominion.h"
@@ -38,66 +38,79 @@ int asserttrue(int testResult) {
 
 int main () {
 
-  int i, result, deckCount, deckTest;
   int numPlayers = 2;
   int player1 = 0;
+  int player2 = 1;
   int seed = 1000;
   int k[10] = {minion, ambassador, tribute, gardens, mine,
 	       remodel, smithy, village, baron, great_hall};
+  int discard[3] = {silver, silver, mine};
+  int hand[3] = {estate, curse, copper};
   struct gameState G; //, preG;
  
   PutSeed(seed);
   
-   
+     
 //--------------------------------------------
-// shuffle: 0 cards
+// player1
 //--------------------------------------------
-  printf ("\nShuffling 0 card deck should fail (return -1):\n");
+  printf ("\nEnding player1 turn with 3 cards in hand and 3 cards in discard\n");
   memset(&G, 0, sizeof(struct gameState)); // Clear game state
   initializeGame(numPlayers, k, seed, &G); // Initialize new game
-  deckCount = 0;
-  G.deckCount[player1] = deckCount;
-  result = shuffle(player1, &G);
-  if(!asserttrue(result == -1)){ 
-    printf("Function did not exit with -1\n");
+  G.discardCount[player1] = 3;
+  memcpy(G.discard[player1], discard, sizeof(int) * 3);
+  G.handCount[player1] = 3;
+  memcpy(G.hand[player1], hand, sizeof(int) * 3);
+  G.coins = 1;
+
+  endTurn(&G);
+
+  printf("Check that current player is player 2:\n");
+  asserttrue(G.whoseTurn == 1);
+
+  printf("Check that player1 hand has 5 cards:\n");
+  if(!asserttrue(G.handCount[player1] == 5)) {
+    printf("(%d cards in hand)\n", G.handCount[player1]);
   }
 
-   
+  printf("Check that player1 discard has 6 cards:\n");
+  asserttrue(G.discardCount[player1] == 6);
+
+  printf("Check that player1 deck has 0 cards:\n");
+  if(!asserttrue(G.deckCount[player1] == 0)) {
+    printf("(%d cards in deck)\n", G.deckCount[player1]);
+  }
+     
 //--------------------------------------------
-// shuffle: 5 cards
+// player2
 //--------------------------------------------
-  printf ("\nShuffling 5 card deck:\n");
+  printf ("\nEnding player2 turn with 3 cards in hand and 3 cards in discard\n");
   memset(&G, 0, sizeof(struct gameState)); // Clear game state
   initializeGame(numPlayers, k, seed, &G); // Initialize new game
-  deckCount = 5;
-  G.deckCount[player1] = deckCount;
-  int deck[5] = {copper, estate, copper, curse, silver};
-  memcpy(G.deck[player1], deck, sizeof(int) * deckCount);
+  G.discardCount[player2] = 3;
+  memcpy(G.discard[player2], discard, sizeof(int) * 3);
+  G.handCount[player2] = 3;
+  memcpy(G.hand[player2], hand, sizeof(int) * 3);
+  G.coins = 1;
+  G.whoseTurn = player2;
 
-  result = shuffle(player1, &G);
-  printf("Shuffle did NOT exit with -1:\n");
-  asserttrue(result != -1);
+  endTurn(&G);
 
-  printf("Check that shuffled deck has same number of cards:\n");
-  asserttrue(deckCount == G.deckCount[player1]);
+  printf("Check that current player is player 1:\n");
+  asserttrue(G.whoseTurn == 0);
 
-  printf("Check that shuffled deck is NOT in same order:\n");
-  deckTest = 0;
-  for (i = 1; i < deckCount; i++) {
-    if (deck[i] != G.deck[player1][i]) {
-      deckTest++;
-    }
+  printf("Check that player2 hand has 5 cards:\n");
+  if(!asserttrue(G.handCount[player2] == 5)) {
+    printf("(%d cards in hand)\n", G.handCount[player2]);
   }
-  asserttrue(deckTest > 0);
 
-  printf("Check that shuffled deck has same number of coppers:\n");
-  deckTest = 0;
-  for (i = 1; i < deckCount; i++) {
-    if (G.deck[player1][i] == copper) {
-      deckTest++;
-    }
+  printf("Check that player2 discard has 6 cards:\n");
+  asserttrue(G.discardCount[player2] == 6);
+
+  printf("Check that player2 deck has 5 cards:\n");
+  if(!asserttrue(G.deckCount[player2] == 5)) {
+    printf("(%d cards in deck)\n", G.deckCount[player2]);
   }
-  asserttrue(deckTest == 2);
 
 
 //----------------------------------------------

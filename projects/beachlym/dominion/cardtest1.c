@@ -38,11 +38,10 @@ int asserttrue(int testResult) {
 
 int main () {
 
-  int i, result, numPlayers;
+  int result, numPlayers;
   int seed = 1000;
   int k[10] = {minion, ambassador, tribute, gardens, mine,
 	       remodel, smithy, village, baron, great_hall};
-  int discardTest, handTest;
   struct gameState G; //, preG;
  
   PutSeed(seed);
