@@ -54,7 +54,7 @@ int main () {
   int choice1; // 0 = no discard, 1 = discard estate
   int discardBaron, discardEstate;
   int numDiscard, numCoin, numSupply;
-  int numTest = 100; // How many random tests to run
+  int numTest = 5000; // How many random tests to run
   struct gameState G, preG;
 
   // Run random tests
@@ -75,7 +75,7 @@ int main () {
       }
       else {
         // Randomly select cards in hand (there are 27 different cards)
-        hand[i] = rand() % 28;
+        hand[i] = rand() % 27;
         if (hand[i] == 1) {handEstate++;}
       }
       printf(" %d", hand[i]);
@@ -87,7 +87,7 @@ int main () {
 
     // Randomly choose action, 0: gain estate, 1: discard estate 
     choice1 = rand() % 2;
-    if (choice1) {printf("Choosing gain estate\n");}
+    if (!choice1) {printf("Choosing gain estate\n");}
     else {printf("Choosing discard estate with %d estate(s) in hand\n", handEstate);}
 
 //--------------------------------------------
@@ -128,21 +128,21 @@ int main () {
     asserttrue(discardEstate == 1);
 
     // Check hand
-    if(choice1 || !handEstate){numDiscard = 1;} // Baron discarded
+    if(!choice1 || !handEstate){numDiscard = 1;} // Baron discarded
     else {numDiscard = 2;} // Estate and Baron discarded
     printf("Check that hand lost %d card(s):\n", numDiscard);
-    asserttrue(G.handCount[player1] == preG.handCount[player1] - numDiscard);
-     
-    if(choice1 || !handEstate){numCoin = 0;}
+    asserttrue(G.handCount[player1] == preG.handCount[player1] - numDiscard); 
+    if(!choice1 || !handEstate){numCoin = 0;}
     else {numCoin = 4;} // Estate discarded for coins 
     printf("Testing that player received %d coins:\n", numCoin);
     asserttrue(G.coins == preG.coins + numCoin);
 
     // Check Supply
-    if(choice1 || !handEstate){numSupply = 1;}
+    if((!choice1 || !handEstate) && supplyEstate){numSupply = 1;}
     else {numSupply = 0;}
     printf("Testing that estate supply lost %d estate(s):\n", numSupply);
     asserttrue(G.supplyCount[estate] == preG.supplyCount[estate] - numSupply);
+    printf("\n");
   }
 
   if (testsFailed) {printf("\nFAILED %d tests\n", testsFailed);}
