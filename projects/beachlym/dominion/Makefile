@@ -42,7 +42,7 @@ randomtestresults: randomtestcard1 randomtestcard2
 	./randomtestcard1 &> randomtestresults.out
 	./randomtestcard2 >> randomtestresults.out
 	./randomtestcard3 >> randomtestresults.out
-	.gcov dominion.c -b -f >> randomtestresults.out
+	gcov dominion.c -b -f >> randomtestresults.out
 	cat dominion.c.gcov >> randomtestresults.out
 
 player: player.c interface.o

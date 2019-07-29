@@ -44,6 +44,7 @@ int main () {
   int seed = rand();
   int i, test;
   int numPlayer = 2;
+  int player;
   int player1 = 0;
   int player2 = 1;
   int k[10] = {minion, tribute, feast, gardens, mine,
@@ -69,47 +70,41 @@ int main () {
     tributePos = rand() % numHand;
     G.hand[tributePos][i] = tribute;
      
-    // Randomly select player 1 deck
-    G.deckCount[player1] = rand() % 5;
-    printf("Setting Player2 Discard, %d card(s)\n", G.deckCount[player1]);
-
-
-    // Randomly select player 2 deck
-    numDeck = rand() % 5;
-    G.deckCount[player2] = numDeck;
-    printf("Setting Player2 Deck, %d card(s):", numDeck);
-    for (i = 0; i < numDeck; i++){
-      // Randomly select cards in hand (there are 27 different cards)
-      G.deck[player2][i] = rand() % 27;
-      printf(" %d", G.deck[player2][i]);
-    }
-    printf("\n");
-    numVictory = numTreasure = numAction = 0;
-    for (i = numDeck - 2; i < numDeck; i++){
-      card = G.deck[player2][i];
-      // If top card matches 2nd-to-top card it is ignored
-      if (i == (numDeck - 1) && card == G.deck[player2][i-1]){
-        break;
+    for (player = 0; player < numPlayer; player++){
+      // Randomly select player 2 deck
+      numDeck = rand() % 5;
+      G.deckCount[player] = numDeck;
+      printf("Setting Player %d Deck, %d card(s):", (player + 1), numDeck);
+      for (i = 0; i < numDeck; i++){
+        // Randomly select cards in hand (there are 27 different cards)
+        G.deck[player2][i] = rand() % 27;
+        printf(" %d", G.deck[player][i]);
       }
-      if (card == estate || card == duchy || card == province ||
-          card == gardens || card == great_hall){ 
-        numVictory++;
-      } 
-      else if (copper <= card && card <= gold){
-        numTreasure++;
-      } 
-      else {
-        numAction++;
+      printf("\n");
+      numVictory = numTreasure = numAction = 0;
+      for (i = numDeck - 2; i < numDeck; i++){
+        card = G.deck[player][i];
+        // If top card matches 2nd-to-top card it is ignored
+        if (i == (numDeck - 1) && card == G.deck[player][i-1]){
+          break;
+        }
+        if (card == estate || card == duchy || card == province ||
+            card == gardens || card == great_hall){ 
+          numVictory++;
+        } 
+        else if (copper <= card && card <= gold){
+          numTreasure++;
+        } 
+        else {
+          numAction++;
+        }
       }
-    }
-     
-    // Randomly select player 1 discard
-    G.discardCount[player1] = rand() % 5;
-    printf("Setting Player1 Discard, %d card(s)\n", G.discardCount[player1]);
-
-    // Randomly select player 2 discard
-    G.discardCount[player2] = rand() % 5;
-    printf("Setting Player2 Discard, %d card(s)\n", G.discardCount[player2]);
+      
+      // Randomly select player 1 discard
+      G.discardCount[player] = rand() % 5;
+      printf("Setting Player %d Discard, %d card(s)\n", (player + 1), 
+        G.discardCount[player1]);
+   }
 
 //--------------------------------------------
 // Run test
