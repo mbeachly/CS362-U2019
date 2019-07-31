@@ -1,7 +1,7 @@
 /*************************************************************
  * Author:	Matt Beachly
  * Date:	7/26/19
- * Description:	Random tests for minionAct function
+ * Description:	Random tests for tributeAct function
  *************************************************************/
 
 #include "dominion.h"
