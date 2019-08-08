@@ -121,6 +121,15 @@ protected void setUp() {
          System.out.println();
       }
    }
+   
+   public void testValidatorUnit() {
+       UrlValidator urlValidator = new UrlValidator();
+       assertFalse(urlValidator.isValid("http://////.org"));
+       assertTrue(urlValidator.isValid("http://tech.yahoo.com/"));
+       //assertFalse(urlValidator.isValid(null)); // Should trigger bug
+       assertTrue(urlValidator.isValid("http://www.oregonstate.c1m/"));
+       assertFalse(urlValidator.isValid("http://www.oregonstate.com/? asfe"));
+   }
 
    public void testValidator202() {
        String[] schemes = {"http","https"};
