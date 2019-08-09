@@ -134,16 +134,16 @@ protected void setUp() {
       }
    }
    
-   /*
-   public void testValidatorOldUnit() {
+   
+   public void testValidatorOld() {
        UrlValidator urlValidator = new UrlValidator();
 //       assertFalse(urlValidator.isValid("http://////.org"));
 //       assertTrue(urlValidator.isValid("http://tech.yahoo.com/"));
 //       assertFalse(urlValidator.isValid(null)); // Bug1
 //       assertFalse(urlValidator.isValid("http://www.oregonstate.c1m/")); // Bug2 (passes invalid authorities)
-       assertFalse(urlValidator.isValid("http://www.oregon state.c1m/?as fe")); // Bug3 (requires spaces in query)
+       assertTrue(urlValidator.isValid("https://search.oregonstate.edu/?q=search")); // Bug3 (requires spaces in query)
    }
-   */
+   
    
    
    //----------------------------------------------------------------------
@@ -240,12 +240,12 @@ protected void setUp() {
    //------------------------------------------------------------------
    //                     testValidatorRand
    // Function called by testIsValidRand
-   // Test 100 random combinations of URLs
+   // Test random combinations of URLs
    //------------------------------------------------------------------
    public void testValidatorRand(Object[] testObjects, long options) {
 	      UrlValidator urlVal = new UrlValidator(null, null, options);
-	      // Run 100 random tests
-	      for (int testNum = 1; testNum <= 100; testNum += 1) {
+	      // Run a number of random tests
+	      for (int testNum = 1; testNum <= 100000; testNum += 1) {
 	    	  // Generate random indexes for scheme, authority, port...
 	    	  randomizeTestPartsIndex(testPartsIndex, testObjects);
 	          StringBuilder testBuffer = new StringBuilder();
@@ -257,23 +257,25 @@ protected void setUp() {
 	            expected &= part[index].valid;
 	         }
 	         String url = testBuffer.toString();
-	         System.out.print("Test # " + testNum + ": URL: " + url);
+	         boolean result = urlVal.isValid(url);
+	         
+	         //System.out.print("Test # " + testNum + ": URL: " + url);
 	         if (expected)
 	         {
+	        	 System.out.print("Test # " + testNum + ": URL: " + url);
 	        	 System.out.print(", Expected Output: T");
+
+		         if (result == expected) {
+		                System.out.println(", Test Result: Pass!");
+		         } else {
+		                System.out.println(", Test Result: Fail!");
+		         }
 	         }
 	         else
 	         {
-	        	 System.out.print(", Expected Output: F");
+	        	 //System.out.print(", Expected Output: F");
 	         }
-
-	         boolean result = urlVal.isValid(url);
-	         if (result == expected) {
-	                System.out.println(", Test Result: Pass!");
-	         } else {
-	                System.out.println(", Test Result: Fail!");
-	         }
-	         //assertEquals(url, expected, result);
+	         assertEquals(url, expected, result);
 	      }  
    }
 
@@ -749,7 +751,9 @@ protected void setUp() {
 
    ResultPair[] testUrlQuery = {new ResultPair("?action=view", true),
                               new ResultPair("?action=edit&mode=up", true),
-                              new ResultPair("", true)
+                              new ResultPair("", true),
+                              new ResultPair("?search=first second", false), // Added to test BUG 3
+                              new ResultPair("?s p a c e s", false)
    };
 
    Object[] testUrlParts = {testUrlScheme, testUrlAuthority, testUrlPort, testPath, testUrlQuery};
