@@ -16,6 +16,9 @@
  */
 
 import junit.framework.TestCase;
+import java.util.Random;
+import java.io.File;
+import java.util.Scanner;
 
 /**
  * Performs Validation Test for url validations.
@@ -47,6 +50,15 @@ protected void setUp() {
                 + UrlValidator.NO_FRAGMENTS;
 
         testIsValid(testUrlPartsOptions, options);
+   }
+   
+   //----------------------------------------------------------------
+   //                      testIsValidRand
+   // Run random tests
+   //----------------------------------------------------------------
+   public void testIsValidRand() {
+	   System.out.print("Random testing\n");
+	   testValidatorRand(testUrlParts, UrlValidator.ALLOW_ALL_SCHEMES);
    }
 
    public void testIsValidScheme() {
@@ -122,13 +134,147 @@ protected void setUp() {
       }
    }
    
-   public void testValidatorUnit() {
+   /*
+   public void testValidatorOldUnit() {
        UrlValidator urlValidator = new UrlValidator();
-       assertFalse(urlValidator.isValid("http://////.org"));
-       assertTrue(urlValidator.isValid("http://tech.yahoo.com/"));
-       //assertFalse(urlValidator.isValid(null)); // Should trigger bug
-       assertTrue(urlValidator.isValid("http://www.oregonstate.c1m/"));
-       assertFalse(urlValidator.isValid("http://www.oregonstate.com/? asfe"));
+//       assertFalse(urlValidator.isValid("http://////.org"));
+//       assertTrue(urlValidator.isValid("http://tech.yahoo.com/"));
+//       assertFalse(urlValidator.isValid(null)); // Bug1
+//       assertFalse(urlValidator.isValid("http://www.oregonstate.c1m/")); // Bug2 (passes invalid authorities)
+       assertFalse(urlValidator.isValid("http://www.oregon state.c1m/?as fe")); // Bug3 (requires spaces in query)
+   }
+   */
+   
+   
+   //----------------------------------------------------------------------
+   //                       testValidatorUnitTest
+   // Reads 100 URL's from file and tests them
+   //----------------------------------------------------------------------
+   public void testValidatorUnitTest()
+   {
+   	Scanner sc;
+   	
+   	try 
+   	{
+   		sc = new Scanner(new File("input.txt"));
+   		
+   		int i = 1; // Use to count the URL.
+   		int pass = 0; // Use to count the tests pass.
+   		int fail = 0; // Use to the count the tests fail.
+   		boolean expectedResult = true;
+   		boolean actualResult = true;
+   		
+   		while(sc.hasNext())
+   		{
+   			String url = sc.next();
+   			// Test null pointer to catch BUG 1
+   			if (url.equals("NULL")) 
+   			{
+   				url = null;
+   			}
+   			
+   			String expectedValue = sc.next();
+   			String actualValue = "";
+   			
+   			/* Output the test description and result to console. */
+   			System.out.printf("Test # %d: URL: %s, Expected Output: %s, ", i, url, expectedValue);
+   			
+   			
+   			// Convert expectedValue string to boolean and store boolean in expectedResult.
+   			if (expectedValue.equals("T"))
+   			{
+   				expectedResult = true;
+   			}
+   			else// if (expectedValue.equals("F"))
+   			{
+   				expectedResult = false;
+   			}
+   			
+   			/* Run the actual isValid() function. */
+   			UrlValidator urlValidator = new UrlValidator();
+   			actualResult = urlValidator.isValid(url);
+   			
+   			// Convert actualResult boolean to string and store string in actualValue.
+   			if (actualResult)
+   			{
+   				actualValue = "T";
+   			}
+   			else
+   			{
+   				actualValue = "F";
+   			}
+   			
+   			//System.out.printf("%s %s\n", url, actualValue);
+   			
+   			// Use IF-ELSE Statements instead of assert to evaluate the actual output against the expected output.
+   			if (actualResult == expectedResult)
+   			{
+   				System.out.printf("Actual Output: %s, Test Result: Pass!\n", actualValue);
+   				pass++;
+   			}
+   			else
+   			{
+   				System.out.printf("Actual Output: %s, Test Result: Fail!\n", actualValue);
+   				fail++;
+   			}
+   			
+   			
+   			i++;
+   			
+	        assertEquals(url, expectedResult, actualResult);
+   		}
+   		
+   		sc.close();
+   		
+   		System.out.printf("For this unit test, out of the %d URLs tested: %d passed and %d failed.\n",
+   				i - 1, pass, fail);
+   	}
+   	
+   	catch(Exception e)
+   	{
+   		System.out.println("Cannot find the input.txt file!\n");
+   	}
+   }
+   
+   
+   //------------------------------------------------------------------
+   //                     testValidatorRand
+   // Function called by testIsValidRand
+   // Test 100 random combinations of URLs
+   //------------------------------------------------------------------
+   public void testValidatorRand(Object[] testObjects, long options) {
+	      UrlValidator urlVal = new UrlValidator(null, null, options);
+	      // Run 100 random tests
+	      for (int testNum = 1; testNum <= 100; testNum += 1) {
+	    	  // Generate random indexes for scheme, authority, port...
+	    	  randomizeTestPartsIndex(testPartsIndex, testObjects);
+	          StringBuilder testBuffer = new StringBuilder();
+	         boolean expected = true;
+	         for (int testPartsIndexIndex = 0; testPartsIndexIndex < testPartsIndex.length; ++testPartsIndexIndex) {
+	            int index = testPartsIndex[testPartsIndexIndex];
+	            ResultPair[] part = (ResultPair[]) testObjects[testPartsIndexIndex];
+	            testBuffer.append(part[index].item);
+	            expected &= part[index].valid;
+	         }
+	         String url = testBuffer.toString();
+	         System.out.print("Test # " + testNum + ": URL: " + url);
+	         if (expected)
+	         {
+	        	 System.out.print(", Expected Output: T");
+	         }
+	         else
+	         {
+	        	 System.out.print(", Expected Output: F");
+	         }
+
+	         boolean result = urlVal.isValid(url);
+	         if (result == expected) {
+	                System.out.println(", Test Result: Pass!");
+	         } else {
+	                System.out.println(", Test Result: Fail!");
+	         }
+	         //assertEquals(url, expected, result);
+	      }  
    }
 
    public void testValidator202() {
@@ -359,6 +505,25 @@ protected void setUp() {
 
       return (!maxIndex);
    }
+    //-----------------------------------------------------------------------------
+    //                         randomizeTestPartsIndex
+    // This function is called by testValidatorRand
+    // Randomly generate indexes to scheme, authority, port, path, and query arrays
+    //-----------------------------------------------------------------------------
+    static boolean randomizeTestPartsIndex(int[] testPartsIndex, Object[] testParts) {
+        boolean maxIndex = true;
+        Random objGenerator = new Random();
+        for (int testPartsIndexIndex = testPartsIndex.length - 1; testPartsIndexIndex >= 0; --testPartsIndexIndex) {
+           int index = testPartsIndex[testPartsIndexIndex];
+           ResultPair[] part = (ResultPair[]) testParts[testPartsIndexIndex];
+           maxIndex &= (index == (part.length - 1));
+           //System.out.println("Array size: " + part.length);
+           testPartsIndex[testPartsIndexIndex] = objGenerator.nextInt(part.length);
+           //System.out.println("Random Index: " + testPartsIndex[testPartsIndexIndex]);
+        }
+
+        return (!maxIndex);
+     }
 
    private String testPartsIndextoString() {
        StringBuilder carryMsg = new StringBuilder("{");

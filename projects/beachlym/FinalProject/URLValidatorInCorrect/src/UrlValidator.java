@@ -167,7 +167,7 @@ public class UrlValidator implements Serializable {
     private static final String PATH_REGEX = "^(/[-\\w:@&?=+,.!/~*'%$_;\\(\\)]*)?$";
     private static final Pattern PATH_PATTERN = Pattern.compile(PATH_REGEX);
 
-    private static final String QUERY_REGEX = "^(\\S*)$"; // BUG 3 !!!
+    private static final String QUERY_REGEX = "^(?)$"; // BUG 3 !!!
 //---------------------------------------------------------------------
     //private static final String QUERY_REGEX = "^(\\S)$";
     private static final Pattern QUERY_PATTERN = Pattern.compile(QUERY_REGEX);
@@ -298,9 +298,9 @@ public class UrlValidator implements Serializable {
      */
     public boolean isValid(String value) {
         if (value == null) {
-        	return true; // BUG 1 !!!
+        	// return true; // BUG 1 !!!
 //-------------------------------------------------------
-            //return false; // Correct
+            return false; // Correct
         }
 
         // Check the whole url address structure
@@ -325,9 +325,9 @@ public class UrlValidator implements Serializable {
         } else { // not file:
             // Validate the authority
         	
-        	if (isValidAuthority(authority)) { // BUG 2 !!!
+        	//if (isValidAuthority(authority)) { // BUG 2 !!! Causes too much crashing
 //----------------------------------------------------------
-            //if (!isValidAuthority(authority)) {
+            if (!isValidAuthority(authority)) {
                 return false;
             }
         }
