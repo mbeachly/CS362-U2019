@@ -241,6 +241,7 @@ protected void setUp() {
    //                     testValidatorRand
    // Function called by testIsValidRand
    // Test random combinations of URLs
+   // Code adapted from testIsValid() function
    //------------------------------------------------------------------
    public void testValidatorRand(Object[] testObjects, long options) {
 	      UrlValidator urlVal = new UrlValidator(null, null, options);
@@ -511,6 +512,7 @@ protected void setUp() {
     //                         randomizeTestPartsIndex
     // This function is called by testValidatorRand
     // Randomly generate indexes to scheme, authority, port, path, and query arrays
+    // Code adapted from incrementTestPartsIndex() function
     //-----------------------------------------------------------------------------
     static boolean randomizeTestPartsIndex(int[] testPartsIndex, Object[] testParts) {
         boolean maxIndex = true;
