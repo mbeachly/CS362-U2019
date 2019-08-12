@@ -27,7 +27,7 @@ h3t://duckduckgo.com F
 ftp://go.com:65535/test2?action=view F
 h3t://go.au:0/$23?.edu F
 http://qq.t23?action=view F
-http://255.ohiostatecom:0/test1/?action=view F
+http://255.ohiostatecom:65535/t23/?action=view 
 h3t://go.eg:80/test1/file?action=edit&mode=up F
 http/gobeavs.com F
 http:/woohoo/..?action=view F

@@ -298,9 +298,9 @@ public class UrlValidator implements Serializable {
      */
     public boolean isValid(String value) {
         if (value == null) {
-        	return true; // BUG 1 !!!
+        	//return true; // BUG 1 !!!
 //-------------------------------------------------------
-            //return false; // Correct
+            return false; // Correct
         }
 
         // Check the whole url address structure
